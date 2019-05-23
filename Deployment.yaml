@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: custom-sdk
+  labels:
+    app: gsutil
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gsutil
+  template:
+    metadata:
+      labels:
+        app: gsutil
+    spec:
+      containers:
+      - name: custom-sdk
+        image: gcr.io/$DEVSHELL_PROJECT_ID/$IMAGE_NAME:$IMAGE_TAG
+        volumeMounts:
+        - name: svc-account
+          mounthPath: "$PATH_TO_SERVICE_ACCOUNT"
+          readOnly: true
+        env:
+        - name: PROJECT_ID
+          value: "$PROJECT_ID"
+        - name: PATH_TO_SERVICE_ACCOUNT
+          value: "$PATH_TO_SERVICE_ACCOUNT"
+        - name: BUCKET_URI
+          value: "gs://$BUCKET_NAME"
+      volumes:
+      - name: svc-account
+        secret:
+          secretName: svc-account
